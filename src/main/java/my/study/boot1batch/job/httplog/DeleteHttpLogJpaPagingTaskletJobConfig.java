@@ -10,6 +10,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
@@ -17,9 +18,12 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
+import static my.study.boot1batch.job.httplog.DeleteHttpLogJpaPagingTaskletJobConfig.JOB_NAME;
+
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
+@ConditionalOnProperty(name = "job.name", havingValue = JOB_NAME)
 public class DeleteHttpLogJpaPagingTaskletJobConfig {
 
     private final JobBuilderFactory jobBuilderFactory;
@@ -28,19 +32,20 @@ public class DeleteHttpLogJpaPagingTaskletJobConfig {
 
     private final HttpLogRepository httpLogRepository;
 
+    public static final String JOB_NAME = "deleteHttpLogJpaPagingTaskletJob";
     private static final int CHUNK_SIZE = 5;
 
     @Bean
-    public Job deleteHttpLogJpaPagingTaskletJob() {
-        return jobBuilderFactory.get("deleteHttpLogJpaPagingTaskletJob")
-                .start(deleteHttpLogJpaPagingTaskletStep())
+    public Job job() {
+        return jobBuilderFactory.get(JOB_NAME)
+                .start(step())
                 .incrementer(new TimestampJobParameter())
                 .build();
     }
 
     @Bean
-    public Step deleteHttpLogJpaPagingTaskletStep() {
-        return stepBuilderFactory.get("deleteHttpLogJpaPagingTaskletStep")
+    public Step step() {
+        return stepBuilderFactory.get(JOB_NAME + "Step")
                 .tasklet((contribution, chunkContext) -> {
 
                     Page<HttpLog> logPage = httpLogRepository.findAll(new PageRequest(0, CHUNK_SIZE));

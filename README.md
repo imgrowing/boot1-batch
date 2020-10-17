@@ -2,6 +2,7 @@
 
 ### IntelliJ 설정
 * Annotation Processors: [v] Enable annotation processing
+* Gradle: build and run using -> IntelliJ 선택
 
 ### 실행 방법:
 * VM Options: `-Xms256m -Xmx256m -XX:+UseG1GC`

@@ -12,14 +12,19 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.persistence.EntityManagerFactory;
 
+import static java.util.stream.Collectors.toList;
+import static my.study.boot1batch.job.httplog.DeleteHttpLogJpaPagingJobConfig.JOB_NAME;
+
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
+@ConditionalOnProperty(name = "job.name", havingValue = JOB_NAME)
 public class DeleteHttpLogJpaPagingJobConfig {
 
     private final JobBuilderFactory jobBuilderFactory;
@@ -30,27 +35,29 @@ public class DeleteHttpLogJpaPagingJobConfig {
 
     private final HttpLogRepository httpLogRepository;
 
-    private static final int CHUNK_SIZE = 1000;
+    public static final String JOB_NAME = "deleteHttpLogJpaPagingJob";
+    private static final int CHUNK_SIZE = 5;
+    private static final int PAGE_SIZE = 10;
 
     @Bean
-    public Job deleteHttpLogJpaPagingJob() {
-        return jobBuilderFactory.get("deleteHttpLogJpaPagingJob")
-                .start(deleteHttpLogJpaPagingStep())
+    public Job job() {
+        return jobBuilderFactory.get(JOB_NAME)
+                .start(step())
                 .incrementer(new TimestampJobParameter())
                 .build();
     }
 
     @Bean
-    public Step deleteHttpLogJpaPagingStep() {
-        return stepBuilderFactory.get("deleteHttpLogJpaPagingStep")
+    public Step step() {
+        return stepBuilderFactory.get(JOB_NAME + "Step")
                 .<HttpLog, HttpLog>chunk(CHUNK_SIZE)
-                .reader(deleteHttpLogJpaPagingItemReader())
-                .writer(deleteHttpLogItemWriter())
+                .reader(jpaPagingItemReader())
+                .writer(deletingWriter())
                 .build();
     }
 
     @Bean
-    public ItemReader<HttpLog> deleteHttpLogJpaPagingItemReader() {
+    public ItemReader<HttpLog> jpaPagingItemReader() {
         JpaPagingItemReader<HttpLog> reader = new JpaPagingItemReader<HttpLog>() {
             @Override
             public int getPage() {
@@ -61,16 +68,16 @@ public class DeleteHttpLogJpaPagingJobConfig {
 
         reader.setName("deleteHttpLogJpaPagingItemReader");
         reader.setEntityManagerFactory(entityManagerFactory);
-        reader.setPageSize(CHUNK_SIZE);
+        reader.setPageSize(PAGE_SIZE);
         reader.setQueryString("SELECT l FROM HttpLog l ORDER BY l.requestAt");
         return reader;
     }
 
     @Bean
-    public ItemWriter<HttpLog> deleteHttpLogItemWriter() {
-        ItemWriter<HttpLog> writer = items -> {
-            log.warn("writer.write()");
-            httpLogRepository.delete(items);
+    public ItemWriter<HttpLog> deletingWriter() {
+        ItemWriter<HttpLog> writer = httpLogs -> {
+            log.warn("writer.write(): " + httpLogs.stream().map(HttpLog::getId).collect(toList()));
+            httpLogRepository.delete(httpLogs);
         };
         return writer;
     }

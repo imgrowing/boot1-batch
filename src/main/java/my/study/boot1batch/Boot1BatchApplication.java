@@ -9,7 +9,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Boot1BatchApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Boot1BatchApplication.class, args);
+        System.exit(
+                SpringApplication.exit( // Spring Boot를 종료시켜 주고 exit code를 반환한다.
+                        SpringApplication.run(Boot1BatchApplication.class, args)
+                )
+        );
     }
 
 }
