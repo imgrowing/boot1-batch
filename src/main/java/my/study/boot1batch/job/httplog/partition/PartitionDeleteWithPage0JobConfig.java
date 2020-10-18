@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import my.study.boot1batch.domain.httplog.HttpLog;
 import my.study.boot1batch.domain.httplog.HttpLogRepository;
-import my.study.boot1batch.job.TimestampJobParameter;
+import my.study.boot1batch.job.support.TimestampJobParameter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;

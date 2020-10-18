@@ -1,10 +1,10 @@
-package my.study.boot1batch.job.httplog;
+package my.study.boot1batch.job.httplog.multithread;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import my.study.boot1batch.domain.httplog.HttpLog;
 import my.study.boot1batch.domain.httplog.HttpLogRepository;
-import my.study.boot1batch.job.TimestampJobParameter;
+import my.study.boot1batch.job.support.TimestampJobParameter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -15,14 +15,13 @@ import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.persistence.EntityManagerFactory;
 
 import static java.util.stream.Collectors.toList;
-import static my.study.boot1batch.job.httplog.MultiThreadDeleteWithPage0JobConfig.JOB_NAME;
+import static my.study.boot1batch.job.httplog.multithread.MultiThreadDeleteWithPage0JobConfig.JOB_NAME;
 
 @Slf4j
 @RequiredArgsConstructor

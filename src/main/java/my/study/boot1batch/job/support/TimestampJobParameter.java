@@ -1,4 +1,4 @@
-package my.study.boot1batch.job;
+package my.study.boot1batch.job.support;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
