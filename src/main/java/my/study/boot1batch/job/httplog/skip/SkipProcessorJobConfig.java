@@ -1,7 +1,6 @@
 package my.study.boot1batch.job.httplog.skip;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import my.study.boot1batch.domain.httplog.HttpLog;
@@ -26,13 +25,13 @@ import javax.persistence.EntityManagerFactory;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
-import static my.study.boot1batch.job.httplog.skip.SkipJobConfig.JOB_NAME;
+import static my.study.boot1batch.job.httplog.skip.SkipProcessorJobConfig.JOB_NAME;
 
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
 @ConditionalOnProperty(name = "job.name", havingValue = JOB_NAME)
-public class SkipJobConfig {
+public class SkipProcessorJobConfig {
 
 
     private final JobBuilderFactory jobBuilderFactory;
@@ -43,7 +42,7 @@ public class SkipJobConfig {
 
     private final HttpLogRepository httpLogRepository;
 
-    public static final String JOB_NAME = "skipJob";
+    public static final String JOB_NAME = "skipProcessorJob";
     private static final int CHUNK_SIZE = 5;
 
     @Value("${skip.limit:10}")
@@ -64,6 +63,8 @@ public class SkipJobConfig {
     이 때 skip limit을 초과하면 step, job 이 fail 된다.
     FIXME skip or retry가 발생하면 해당 chunk는 무조건 rollback 된다. 하지만 noRollback(Exception)을 지정하면 rollback을 하지 않고 처리를 계속 수행한다.
     FIXME 따라서 noRollback(Exception)을 지정하면 위의 (2) 번에서 (0)으로 돌아가지 않고 계속 진행하게 된다.
+    FIXME: processor에서 발생할 수 있는 Exception인 경우, 안전하게 하려면 noRollback을 설정하면 rollback 없이 원하는 처리를 할 수 있겠다.
+    FIXME: noRollback 대신 chunkSize를 1로 하는 것은 좋은 전략이 아닐 듯 하다.
 
     10개의 데이터를 준비, chunkSize는 5
     chunk 1에서 1개의 exception 발생: id가 4
