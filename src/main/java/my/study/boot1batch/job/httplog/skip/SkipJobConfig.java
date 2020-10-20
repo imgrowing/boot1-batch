@@ -62,6 +62,8 @@ public class SkipJobConfig {
     하지만 exception이 발생한 item은 재시작한 chunk에서는 포함되지 않은 상태로 진행된다.
     재시작한 chunk가 exception이 발생한 item의 위치에 도달했을 때 (처리는 하지 않지만) skip 누적 카운트를 계산하여 skip limit와 비교한다.
     이 때 skip limit을 초과하면 step, job 이 fail 된다.
+    FIXME skip or retry가 발생하면 해당 chunk는 무조건 rollback 된다. 하지만 noRollback(Exception)을 지정하면 rollback을 하지 않고 처리를 계속 수행한다.
+    FIXME 따라서 noRollback(Exception)을 지정하면 위의 (2) 번에서 (0)으로 돌아가지 않고 계속 진행하게 된다.
 
     10개의 데이터를 준비, chunkSize는 5
     chunk 1에서 1개의 exception 발생: id가 4
@@ -158,6 +160,7 @@ public class SkipJobConfig {
                 .faultTolerant()
                 .skipLimit(skipLimit)
                 .skip(MySkippableException.class)
+                .noRollback(MySkippableException.class) // skip or retry가 발생하면 해당 chunk는 무조건 rollback 되지만, noRollback(Exception)을 지정하면 rollback을 하지 않고 처리를 계속 수행한다.
                 .build();
     }
 
