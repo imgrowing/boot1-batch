@@ -94,6 +94,15 @@ public class CsvUserJob {
             }
 
             User user = userRepository.findByLoginId(dto.getLoginId());
+
+            if (user == null) {
+                return null;
+            }
+
+            if (user.getLastLoginAt() != null && user.getLastLoginAt().after(lastLoginAt)) {
+                return null;
+            }
+
             user.setLastLoginAt(lastLoginAt);
             return user;
         };
@@ -104,6 +113,7 @@ public class CsvUserJob {
         JpaItemWriter<User> writer = new JpaItemWriter<>();
         writer.setEntityManagerFactory(entityManagerFactory);
         /*
+         TODO Transaction 범위 내부인
          TODO ItemProcessor에서 User entity의 변경사항이 발생하기 때문에,
          TODO 로그만 출력하는 itemWriter를 사용하더라도 users에 저장이 된다.
          TODO 하지만 JpaItemWriter를 사용하지 않으니, CHUNK_SIZE의 마지막 row에서 updatedAt이 현재시각으로 갱신되지 않는 현상이 발견됨
