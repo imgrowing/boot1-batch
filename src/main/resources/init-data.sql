@@ -1,3 +1,15 @@
+/*
+USE mysql;
+
+CREATE USER 'batch'@'%' IDENTIFIED BY 'batch';
+CREATE USER 'batch'@'localhost' IDENTIFIED BY 'batch';
+
+GRANT ALL PRIVILEGES ON study.* TO 'batch'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON study.* TO 'batch'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+*/
+
+
 ##################################
 # http_logs
 ##################################
