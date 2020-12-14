@@ -24,8 +24,10 @@ public class User {
 
     private String loginId;
 
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastLoginAt;
 
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
     @PostUpdate
